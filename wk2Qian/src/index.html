@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title></title>
+		<link rel="stylesheet" href="js/libs/mui.min.css">
+	</head>
+	<style>
+		.btns{
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			padding: 0 1rem;
+		}
+	</style>
+	<body>
+		<ul class="mui-table-view ul">
+			<li class="mui-table-view-cell mui-media li">
+				<a href="javascript:;">
+					<img class="mui-media-object mui-pull-left" src="img/1.jpg">
+					<div class="mui-media-body">
+						幸福
+						<p class='mui-ellipsis'>能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p>
+					</div>
+				</a>
+				<div class="btns">
+					<button type="button" class="mui-btn mui-btn-danger">查看详情</button>
+				</div>
+
+			</li>
+		</ul>
+	</body>
+	<script src="js/libs/mui.min.js"></script>
+	<script>
+		init()
+		var ul = document.querySelector('.ul')
+		function init() {
+			mui.init();
+			
+		}
+		// 获取数据
+		getData()
+		function getData() {
+			mui.ajax('/api/list',{
+				dataType:'json',//服务器返回json格式数据
+				type:'get',//HTTP请求类型
+				success:function(data){
+					console.log(data);
+					render(data)
+				},
+				error:function(xhr,type,errorThrown){
+					
+				}
+			});
+		}
+		
+		// 渲染列表
+		function render(data){
+			var data = data.data;
+			console.log(data);
+			var str = '';
+			data.map(item => {
+				return str += `
+					<li class="mui-table-view-cell mui-media li">
+						<a href="javascript:;">
+							<img class="mui-media-object mui-pull-left" src="img/1.jpg">
+							<div class="mui-media-body">
+								${item.name}
+								<p class='mui-ellipsis'>${item.introduce}</p>
+							</div>
+						</a>
+						<div class="btns">
+							<button type="button" class="mui-btn mui-btn-danger detal" data-id="${item._id}">查看详情</button>
+						</div>
+					
+					</li>
+				`
+			}).join()
+			ul.innerHTML = str;
+			
+			var detal = document.querySelectorAll('.detal');
+			btns(detal);
+		}
+		
+		//点击跳转页面
+		function btns(detal) {
+			detal.forEach(item => {
+				item.onclick = function() {
+					var id = this.getAttribute('data-id');
+					window.location.href = 'detal.html?id=' + id;
+				}
+			})
+		}
+	</script>
+</html>

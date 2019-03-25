@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title></title>
+		<link rel="stylesheet" href="js/libs/mui.min.css">
+	</head>
+	<style>
+		.list{
+			display: none;
+		}
+	</style>
+	<body>
+		<div class="wrap">
+			<!-- <div class="mui-card">
+				<!--页眉，放置标题-->
+			<!-- <div class="mui-card-header"> -->
+			<!-- aaa -->
+			<!-- </div> -->
+			<!--内容区-->
+			<!-- <div class="mui-card-content">
+					<img src="img/1.jpg" alt="">
+				</div> -->
+			<!--页脚，放置补充信息或支持的操作-->
+			<!-- <div class="mui-card-footer">
+					<span>点赞</span>
+					<span>评论</span>
+					<span>转发</span>
+				</div> -->
+			<!-- </div> -->
+		</div>
+		<div class="list">
+			<ul class="mui-table-view ulll">
+				<!-- <li class="mui-table-view-cell">aaa</li> -->
+			</ul>
+		</div>
+		<input type="text" id="inp" placeholder="输入评论">
+		<button type="button" class="mui-btn mui-btn-danger detal" id="btnnn">提交</button>
+		<script src="js/libs/mui.min.js"></script>
+		<script>
+			mui.init();
+			var wrap = document.querySelector('.wrap');
+			var list = document.querySelector('.list');
+			var ulll = document.querySelector('.ulll');
+			var inp = document.querySelector('#inp');
+			var btnnn = document.querySelector('#btnnn');
+			var _id = location.search.substr(4);
+			console.log(_id);
+
+			mui.ajax('/api/list', {
+				data: {
+					_id: _id
+				},
+				dataType: 'json', //服务器返回json格式数据
+				type: 'get', //HTTP请求类型
+				success: function(data) {
+					console.log(data);
+					render(data);
+				},
+				error: function(xhr, type, errorThrown) {
+
+				}
+			});
+
+			function render(data) {
+				var data = data.data;
+				var str = '';
+				data.map(item => {
+					return str =
+						`
+						<div class="mui-card">
+							<!--页眉，放置标题-->
+							<div class="mui-card-header">
+								${item.introduce}
+							</div>
+							<!--内容区-->
+							<div class="mui-card-content">
+								<img src="img/1.jpg" alt="">
+								价格 ： ${item.price}
+							</div>
+							<!--页脚，放置补充信息或支持的操作-->
+							<div class="mui-card-footer">
+								<span>点赞</span>
+								<span class="pl">评论</span>
+								<span>转发</span>
+							</div>
+						</div>
+					`
+				}).join()
+				wrap.innerHTML = str;
+
+				var plBtn = document.querySelector('.pl');
+				getPinlun(plBtn);
+			}
+			
+			
+
+			function getPinlun(btn) {
+				btn.onclick = function() {
+					list.style.display = 'block';
+					mui.ajax('/api/getPinlun',{
+						dataType:'json',//服务器返回json格式数据
+						type:'get',//HTTP请求类型
+						timeout:10000,//超时时间设置为10秒；
+						success:function(pldata){
+							var pl = pldata.data;
+							pl.map(item => {
+								return ulll.innerHTML += `
+									<li class="mui-table-view-cell">${item.content}</li>
+								`
+							}).join()
+							
+						},
+						error:function(xhr,type,errorThrown){
+							
+						}
+					});
+				}
+			}
+			
+		//添加评论
+		btnnn.onclick = function() {
+			mui.ajax('/api/addPinlun',{
+				data:{
+					content : inp.value
+				},
+				dataType:'json',//服务器返回json格式数据
+				type:'get',//HTTP请求类型
+				timeout:10000,//超时时间设置为10秒；
+				success:function(data){
+					console.log(data);
+				},
+				error:function(xhr,type,errorThrown){
+					
+				}
+			});
+		}
+		</script>
+	</body>
+</html>
